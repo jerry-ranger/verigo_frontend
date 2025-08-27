@@ -2,7 +2,7 @@ import { Typography, Box, Toolbar, Container, Paper, TextField, Button, MenuItem
 import { useState } from 'react';
 import HeaderView from './HeaderView';
 
-function RegisterPage({ onBack, onLogout }) {
+function RegisterPage({ onBack, onLogout, darkMode, onToggleDarkMode }) {
   const [formData, setFormData] = useState({
     name: '',
     dob: '',
@@ -33,7 +33,7 @@ function RegisterPage({ onBack, onLogout }) {
 
   return (
     <>
-      <HeaderView showButtons={true} onLogout={onLogout} onBack={onBack} />
+      <HeaderView showButtons={true} onLogout={onLogout} onBack={onBack} darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} />
       <Box component="main" sx={{ p: 3 }}>
         <Toolbar />
         <Container maxWidth="md">

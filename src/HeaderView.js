@@ -4,8 +4,11 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
-function HeaderView({ showButtons, onLogout, onRegister, onBack }) {
+function HeaderView({ showButtons, onLogout, onRegister, onBack, onAdmin, darkMode, onToggleDarkMode }) {
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar component="nav">
@@ -18,17 +21,26 @@ function HeaderView({ showButtons, onLogout, onRegister, onBack }) {
             Verigo
           </Typography>
           {showButtons && (
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               {onBack ? (
                 <Button color="inherit" onClick={onBack}>Back</Button>
               ) : (
                 <>
                   <Button color="inherit" onClick={onRegister}>Register</Button>
                   <Button color="inherit">Edit</Button>
+                  <Button color="inherit" onClick={onAdmin}>Admin</Button>
                 </>
               )}
               <Button color="inherit" onClick={onLogout}>Logout</Button>
+              <IconButton color="inherit" onClick={onToggleDarkMode}>
+                {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+              </IconButton>
             </Box>
+          )}
+          {!showButtons && (
+            <IconButton color="inherit" onClick={onToggleDarkMode}>
+              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
           )}
         </Toolbar>
       </AppBar>

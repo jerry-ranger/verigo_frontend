@@ -1,24 +1,37 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, Container, Paper, TextField, Button, Typography, Box, Toolbar } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import HeaderView from './HeaderView';
 import HomePage from './HomePage';
 import RegisterPage from './RegisterPage';
-
-const theme = createTheme();
+import AdminPage from './AdminPage';
+import { credentialsService } from './credentialsService';
 
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
+  const [darkMode, setDarkMode] = useState(false);
+
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+    },
+  });
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (email === 'admin' && password === 'admin') {
-      setIsLoggedIn(true);
-    } else {
-      alert('Invalid credentials');
+    try {
+      const credentials = credentialsService.getCredentials();
+      const user = credentials.find(u => u.id === email && u.password === password);
+      if (user) {
+        setIsLoggedIn(true);
+      } else {
+        alert('Invalid credentials');
+      }
+    } catch (error) {
+      alert('Login error');
     }
   };
 
@@ -33,6 +46,14 @@ function App() {
     setCurrentPage('register');
   };
 
+  const handleAdmin = () => {
+    setCurrentPage('admin');
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   const handleBack = () => {
     setCurrentPage('home');
   };
@@ -42,14 +63,22 @@ function App() {
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <RegisterPage onLogout={handleLogout} onBack={handleBack} />
+          <RegisterPage onLogout={handleLogout} onBack={handleBack} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+        </ThemeProvider>
+      );
+    }
+    if (currentPage === 'admin') {
+      return (
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <AdminPage onLogout={handleLogout} onBack={handleBack} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
         </ThemeProvider>
       );
     }
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <HomePage onLogout={handleLogout} onRegister={handleRegister} />
+        <HomePage onLogout={handleLogout} onRegister={handleRegister} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
       </ThemeProvider>
     );
   }
@@ -57,7 +86,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <HeaderView />
+      <HeaderView darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
       <Box component="main" sx={{ p: 3 }}>
         <Toolbar />
         <Container maxWidth="sm">
@@ -83,9 +112,6 @@ function App() {
                 />
                 <Button type="submit" variant="contained" sx={{ mt: 1 }}>
                   Login
-                </Button>
-                <Button variant="text" sx={{ mt: 1 }}>
-                  Sign Up
                 </Button>
               </Box>
             </Paper>
