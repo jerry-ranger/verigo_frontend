@@ -1,5 +1,9 @@
-import { Container, Paper, TextField, Button, Typography, Box } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CssBaseline, Container, Paper, TextField, Button, Typography, Box, Toolbar } from '@mui/material';
 import { useState } from 'react';
+import HeaderView from './HeaderView';
+
+const theme = createTheme();
 
 function App() {
   const [email, setEmail] = useState('');
@@ -11,43 +15,41 @@ function App() {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 8 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" align="center" gutterBottom>
-            Login
-          </Typography>
-          <Box component="form" onSubmit={handleLogin}>
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              margin="normal"
-              required
-            />
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              margin="normal"
-              required
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3 }}
-            >
-              Login
-            </Button>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <HeaderView />
+      <Box component="main" sx={{ p: 3 }}>
+        <Toolbar />
+        <Container maxWidth="sm">
+          <Box sx={{ mt: 8 }}>
+            <Paper sx={{ p: 4 }}>
+              <Typography variant="h4" align="center" sx={{ mb: 3 }}>
+                Login
+              </Typography>
+              <Box component="form" onSubmit={handleLogin} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <TextField
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <TextField
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Button type="submit" variant="contained" sx={{ mt: 1 }}>
+                  Login
+                </Button>
+              </Box>
+            </Paper>
           </Box>
-        </Paper>
+        </Container>
       </Box>
-    </Container>
+    </ThemeProvider>
   );
 }
 
