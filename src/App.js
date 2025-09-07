@@ -1,6 +1,7 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Container, Paper, TextField, Button, Typography, Box, Toolbar, FormControlLabel, Checkbox } from '@mui/material';
+import { CssBaseline, Container, Paper, TextField, Button, Typography, Box, Toolbar, FormControlLabel, Checkbox, Alert } from '@mui/material';
 import { useState, useEffect } from 'react';
+import ErrorIcon from '@mui/icons-material/Error';
 import HeaderView from './HeaderView';
 import HomePage from './HomePage';
 import RegisterPage from './RegisterPage';
@@ -12,20 +13,23 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentPage, setCurrentPage] = useState('edit');
+  const [currentPage, setCurrentPage] = useState('manage');
   const [darkMode, setDarkMode] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const savedLogin = localStorage.getItem('verigo_login');
     if (savedLogin) {
-      const { email: savedEmail, timestamp } = JSON.parse(savedLogin);
+      const { email: savedEmail, timestamp, isAdmin: savedIsAdmin } = JSON.parse(savedLogin);
       const now = new Date().getTime();
       const sevenDays = 7 * 24 * 60 * 60 * 1000;
       
       if (now - timestamp < sevenDays) {
         setEmail(savedEmail);
         setIsLoggedIn(true);
+        setIsAdmin(savedIsAdmin || false);
       } else {
         localStorage.removeItem('verigo_login');
       }
@@ -38,25 +42,64 @@ function App() {
     },
   });
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setLoginError('');
     try {
-      const credentials = credentialsService.getCredentials();
-      const user = credentials.find(u => u.id === email && u.password === password);
-      if (user) {
+      // First check local credentials (master users)
+      const localCredentials = credentialsService.getCredentials();
+      const localUser = localCredentials.find(u => u.id === email && u.password === password);
+      
+      if (localUser) {
+        // Master user from local credentials
         setIsLoggedIn(true);
+        setIsAdmin(true); // Local users are master users
         
         if (rememberMe) {
           localStorage.setItem('verigo_login', JSON.stringify({
             email: email,
-            timestamp: new Date().getTime()
+            timestamp: new Date().getTime(),
+            isAdmin: true
           }));
         }
-      } else {
-        alert('Invalid credentials');
+        return;
+      }
+      
+      // If not found locally, check API credentials (general users)
+      try {
+        const response = await fetch('https://5qolrhlh9g.execute-api.ap-south-1.amazonaws.com/prod/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            operation: 'login', 
+            id: email, 
+            password: password 
+          })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          // General user from API
+          setIsLoggedIn(true);
+          setIsAdmin(false); // API users are general users
+          
+          if (rememberMe) {
+            localStorage.setItem('verigo_login', JSON.stringify({
+              email: email,
+              timestamp: new Date().getTime(),
+              isAdmin: false
+            }));
+          }
+        } else {
+          setLoginError('Invalid credentials');
+        }
+      } catch (apiError) {
+        setLoginError('Invalid credentials');
       }
     } catch (error) {
-      alert('Login error');
+      setLoginError('Login error');
     }
   };
 
@@ -64,8 +107,9 @@ function App() {
     setIsLoggedIn(false);
     setEmail('');
     setPassword('');
-    setCurrentPage('home');
+    setCurrentPage('manage');
     setRememberMe(false);
+    setIsAdmin(false);
     localStorage.removeItem('verigo_login');
   };
 
@@ -74,11 +118,13 @@ function App() {
   };
 
   const handleAdmin = () => {
-    setCurrentPage('admin');
+    if (isAdmin) {
+      setCurrentPage('admin');
+    }
   };
 
-  const handleEdit = () => {
-    setCurrentPage('edit');
+  const handleManage = () => {
+    setCurrentPage('manage');
   };
 
   const toggleDarkMode = () => {
@@ -86,7 +132,7 @@ function App() {
   };
 
   const handleBack = () => {
-    setCurrentPage('edit');
+    setCurrentPage('manage');
   };
 
   if (isLoggedIn) {
@@ -94,7 +140,7 @@ function App() {
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <RegisterPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onEdit={handleEdit} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+          <RegisterPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onManage={handleManage} onAdmin={handleAdmin} isAdmin={isAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
         </ThemeProvider>
       );
     }
@@ -102,22 +148,15 @@ function App() {
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <AdminPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onEdit={handleEdit} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+          <AdminPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onManage={handleManage} onAdmin={handleAdmin} isAdmin={isAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
         </ThemeProvider>
       );
     }
-    if (currentPage === 'home') {
-      return (
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <HomePage onLogout={handleLogout} onRegister={handleRegister} onAdmin={handleAdmin} onEdit={handleEdit} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
-        </ThemeProvider>
-      );
-    }
+    // Default to manage page after login
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <EditPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onAdmin={handleAdmin} onEdit={handleEdit} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+        <EditPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onAdmin={handleAdmin} onManage={handleManage} isAdmin={isAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
       </ThemeProvider>
     );
   }
@@ -134,6 +173,16 @@ function App() {
               <Typography variant="h4" align="center" sx={{ mb: 3 }}>
                 Login
               </Typography>
+              {loginError && (
+                <Alert 
+                  icon={<ErrorIcon fontSize="inherit" />} 
+                  severity="error"
+                  sx={{ mb: 2 }}
+                  onClose={() => setLoginError('')}
+                >
+                  {loginError}
+                </Alert>
+              )}
               <Box component="form" onSubmit={handleLogin} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <TextField
                   label="ID"

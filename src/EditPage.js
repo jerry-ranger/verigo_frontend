@@ -3,10 +3,33 @@ import { useState, useEffect } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import HeaderView from './HeaderView';
 
-function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, onAdmin, onEdit }) {
+function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, onAdmin, onManage, isAdmin }) {
   const theme = useTheme();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleDocumentView = async (e, partnerId, documentType) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('https://5qolrhlh9g.execute-api.ap-south-1.amazonaws.com/prod/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          operation: 'download', 
+          partnerId: partnerId, 
+          documentType: documentType 
+        })
+      });
+      const result = await response.json();
+      if (result.downloadUrl) {
+        window.open(result.downloadUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Error getting document URL:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -41,8 +64,9 @@ function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, on
         darkMode={darkMode} 
         onToggleDarkMode={onToggleDarkMode}
         onRegister={onRegister}
-        onEdit={onEdit}
+        onManage={onManage}
         onAdmin={onAdmin}
+        isAdmin={isAdmin}
       />
       <Box component="main" sx={{ p: 3 }}>
         <Toolbar />
@@ -66,7 +90,7 @@ function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, on
                   color: theme.palette.text.primary
                 }}
               >
-                Employee Management
+                Partner Management
               </Typography>
             </Box>
             
@@ -114,22 +138,22 @@ function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, on
                         <TableCell>{employee.accountName}</TableCell>
                         <TableCell>
                           {employee.documents?.photo ? (
-                            <a href={employee.documents.photo.replace('s3://', 'https://s3.ap-south-1.amazonaws.com/')} target="_blank" rel="noopener noreferrer">View</a>
+                            <a href="#" onClick={(e) => handleDocumentView(e, employee.partnerId, 'photo')} style={{cursor: 'pointer', color: theme.palette.primary.main}}>View</a>
                           ) : 'N/A'}
                         </TableCell>
                         <TableCell>
                           {employee.documents?.aadhaar ? (
-                            <a href={employee.documents.aadhaar.replace('s3://', 'https://s3.ap-south-1.amazonaws.com/')} target="_blank" rel="noopener noreferrer">View</a>
+                            <a href="#" onClick={(e) => handleDocumentView(e, employee.partnerId, 'aadhaar')} style={{cursor: 'pointer', color: theme.palette.primary.main}}>View</a>
                           ) : 'N/A'}
                         </TableCell>
                         <TableCell>
                           {employee.documents?.license ? (
-                            <a href={employee.documents.license.replace('s3://', 'https://s3.ap-south-1.amazonaws.com/')} target="_blank" rel="noopener noreferrer">View</a>
+                            <a href="#" onClick={(e) => handleDocumentView(e, employee.partnerId, 'license')} style={{cursor: 'pointer', color: theme.palette.primary.main}}>View</a>
                           ) : 'N/A'}
                         </TableCell>
                         <TableCell>
                           {employee.documents?.panCard ? (
-                            <a href={employee.documents.panCard.replace('s3://', 'https://s3.ap-south-1.amazonaws.com/')} target="_blank" rel="noopener noreferrer">View</a>
+                            <a href="#" onClick={(e) => handleDocumentView(e, employee.partnerId, 'panCard')} style={{cursor: 'pointer', color: theme.palette.primary.main}}>View</a>
                           ) : 'N/A'}
                         </TableCell>
                       </TableRow>

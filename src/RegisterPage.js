@@ -5,7 +5,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import HeaderView from './HeaderView';
 
-function RegisterPage({ onBack, onLogout, onRegister, onEdit, onAdmin, darkMode, onToggleDarkMode }) {
+function RegisterPage({ onBack, onLogout, onRegister, onManage, onAdmin, isAdmin, darkMode, onToggleDarkMode }) {
   const theme = useTheme();
   const [formData, setFormData] = useState({
     name: '',
@@ -39,6 +39,18 @@ function RegisterPage({ onBack, onLogout, onRegister, onEdit, onAdmin, darkMode,
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64 = reader.result.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+        resolve(base64);
+      };
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -54,12 +66,26 @@ function RegisterPage({ onBack, onLogout, onRegister, onEdit, onAdmin, darkMode,
     }
     
     try {
+      // Convert files to base64
+      const submitData = { ...formData };
+      const fileTypes = ['photo', 'aadhaar', 'panCard', 'license'];
+      
+      for (const fileType of fileTypes) {
+        if (formData[fileType]) {
+          const base64Content = await convertFileToBase64(formData[fileType]);
+          submitData[fileType] = {
+            content: base64Content,
+            name: formData[fileType].name
+          };
+        }
+      }
+      
       const response = await fetch('https://5qolrhlh9g.execute-api.ap-south-1.amazonaws.com/prod/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
       const result = await response.json();
       console.log('Registration response:', result);
@@ -72,7 +98,7 @@ function RegisterPage({ onBack, onLogout, onRegister, onEdit, onAdmin, darkMode,
 
   return (
     <>
-      <HeaderView showButtons={true} onLogout={onLogout} onBack={onBack} onRegister={onRegister} onEdit={onEdit} onAdmin={onAdmin} darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} />
+      <HeaderView showButtons={true} onLogout={onLogout} onRegister={onRegister} onManage={onManage} onAdmin={onAdmin} isAdmin={isAdmin} darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} />
       <Box component="main" sx={{ p: 3 }}>
         <Toolbar />
         <Container maxWidth="md">
