@@ -1,5 +1,5 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Container, Paper, TextField, Button, Typography, Box, Toolbar } from '@mui/material';
+import { CssBaseline, Container, Paper, TextField, Button, Typography, Box, Toolbar, FormControlLabel, Checkbox } from '@mui/material';
 import { useState, useEffect } from 'react';
 import HeaderView from './HeaderView';
 import HomePage from './HomePage';
@@ -13,6 +13,23 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
   const [darkMode, setDarkMode] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    const savedLogin = localStorage.getItem('verigo_login');
+    if (savedLogin) {
+      const { email: savedEmail, timestamp } = JSON.parse(savedLogin);
+      const now = new Date().getTime();
+      const sevenDays = 7 * 24 * 60 * 60 * 1000;
+      
+      if (now - timestamp < sevenDays) {
+        setEmail(savedEmail);
+        setIsLoggedIn(true);
+      } else {
+        localStorage.removeItem('verigo_login');
+      }
+    }
+  }, []);
 
   const theme = createTheme({
     palette: {
@@ -27,6 +44,13 @@ function App() {
       const user = credentials.find(u => u.id === email && u.password === password);
       if (user) {
         setIsLoggedIn(true);
+        
+        if (rememberMe) {
+          localStorage.setItem('verigo_login', JSON.stringify({
+            email: email,
+            timestamp: new Date().getTime()
+          }));
+        }
       } else {
         alert('Invalid credentials');
       }
@@ -40,6 +64,8 @@ function App() {
     setEmail('');
     setPassword('');
     setCurrentPage('home');
+    setRememberMe(false);
+    localStorage.removeItem('verigo_login');
   };
 
   const handleRegister = () => {
@@ -109,6 +135,15 @@ function App() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                    />
+                  }
+                  label="Remember me for 7 days"
                 />
                 <Button type="submit" variant="contained" sx={{ mt: 1 }}>
                   Login

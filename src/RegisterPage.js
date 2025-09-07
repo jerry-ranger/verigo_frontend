@@ -1,10 +1,12 @@
-import { Typography, Box, Toolbar, Container, Paper, TextField, Button, MenuItem, Grid, Alert } from '@mui/material';
+import { Typography, Box, Toolbar, Container, Paper, TextField, Button, Grid, Alert, Divider, useTheme } from '@mui/material';
 import { useState } from 'react';
 import CheckIcon from '@mui/icons-material/Check';
 import ErrorIcon from '@mui/icons-material/Error';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import HeaderView from './HeaderView';
 
 function RegisterPage({ onBack, onLogout, darkMode, onToggleDarkMode }) {
+  const theme = useTheme();
   const [formData, setFormData] = useState({
     name: '',
     dob: '',
@@ -33,8 +35,24 @@ function RegisterPage({ onBack, onLogout, darkMode, onToggleDarkMode }) {
     setFormData({ ...formData, [field]: e.target.files[0] });
   };
 
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate inputs
+    if (!formData.name.trim()) {
+      setAlert({ type: 'error', message: 'Please enter your name' });
+      return;
+    }
+    
+    if (!validateEmail(formData.emailId)) {
+      setAlert({ type: 'error', message: 'Please enter a valid email address' });
+      return;
+    }
+    
     try {
       const response = await fetch('https://5qolrhlh9g.execute-api.ap-south-1.amazonaws.com/prod/', {
         method: 'POST',
@@ -58,10 +76,29 @@ function RegisterPage({ onBack, onLogout, darkMode, onToggleDarkMode }) {
       <Box component="main" sx={{ p: 3 }}>
         <Toolbar />
         <Container maxWidth="md">
-          <Paper sx={{ p: 4 }}>
-            <Typography variant="h4" align="center" sx={{ mb: 3 }}>
-              Register New Partner
-            </Typography>
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              p: 4, 
+              borderRadius: 2,
+              boxShadow: theme.shadows[3],
+              border: `1px solid ${theme.palette.divider}`
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 4 }}>
+              <PersonAddIcon sx={{ fontSize: 32, mr: 1, color: theme.palette.primary.main }} />
+              <Typography 
+                variant="h4" 
+                align="center"
+                sx={{ 
+                  fontWeight: 600,
+                  color: theme.palette.text.primary
+                }}
+              >
+                Partner Registration
+              </Typography>
+            </Box>
+            <Divider sx={{ mb: 4 }} />
             {alert && (
               <Alert 
                 icon={alert.type === 'success' ? <CheckIcon fontSize="inherit" /> : <ErrorIcon fontSize="inherit" />} 
@@ -73,177 +110,293 @@ function RegisterPage({ onBack, onLogout, darkMode, onToggleDarkMode }) {
               </Alert>
             )}
             <Box component="form" onSubmit={handleSubmit}>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                General Details
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 3, 
+                  fontWeight: 500,
+                  color: theme.palette.primary.main,
+                  borderBottom: `2px solid ${theme.palette.primary.main}`,
+                  pb: 1,
+                  display: 'inline-block'
+                }}
+              >
+                Essential Information
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                   <TextField
-                    fullWidth
-                    label="Name"
+                    sx={{ flex: 1 }}
+                    label="Full Name"
                     value={formData.name}
                     onChange={handleInputChange('name')}
                     required
+                    variant="outlined"
                   />
-                </Grid>
-                <Grid item xs={12} sm={6}>
                   <TextField
-                    fullWidth
+                    sx={{ flex: 1 }}
                     label="Date of Birth"
                     type="date"
                     value={formData.dob}
                     onChange={handleInputChange('dob')}
+                    required
+                    variant="outlined"
                     InputLabelProps={{ shrink: true }}
-                    required
                   />
-                </Grid>
-                <Grid item xs={12}>
+                </Box>
+                <TextField
+                  fullWidth
+                  label="Address"
+                  value={formData.address}
+                  onChange={handleInputChange('address')}
+                  required
+                  variant="outlined"
+                  multiline
+                  rows={2}
+                />
+                <Box sx={{ display: 'flex', gap: 2 }}>
                   <TextField
-                    fullWidth
-                    label="Address"
-                    multiline
-                    rows={2}
-                    value={formData.address}
-                    onChange={handleInputChange('address')}
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
+                    sx={{ flex: 1 }}
                     label="Father's Name"
                     value={formData.fatherName}
                     onChange={handleInputChange('fatherName')}
                     required
+                    variant="outlined"
                   />
-                </Grid>
-                <Grid item xs={12} sm={6}>
                   <TextField
-                    fullWidth
+                    sx={{ flex: 1 }}
                     label="Mother's Name"
                     value={formData.motherName}
                     onChange={handleInputChange('motherName')}
                     required
+                    variant="outlined"
                   />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                   <TextField
-                    fullWidth
+                    sx={{ flex: 1 }}
                     label="Phone Number"
                     value={formData.phoneNumber}
                     onChange={handleInputChange('phoneNumber')}
                     required
+                    variant="outlined"
                   />
-                </Grid>
-                <Grid item xs={12} sm={6}>
                   <TextField
-                    fullWidth
-                    label="Email ID"
+                    sx={{ flex: 1 }}
+                    label="Email Address"
                     type="email"
                     value={formData.emailId}
                     onChange={handleInputChange('emailId')}
                     required
+                    variant="outlined"
                   />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    select
-                    label="Marital Status"
-                    value={formData.maritalStatus}
-                    onChange={handleInputChange('maritalStatus')}
-                    required
-                  >
-                    <MenuItem value="Single">Single</MenuItem>
-                    <MenuItem value="Married">Married</MenuItem>
-                  </TextField>
-                </Grid>
-              </Grid>
+                </Box>
+                <TextField
+                  fullWidth
+                  label="Marital Status"
+                  value={formData.maritalStatus}
+                  onChange={handleInputChange('maritalStatus')}
+                  required
+                  variant="outlined"
+                  placeholder="Enter marital status"
+                />
+              </Box>
               
-              <Typography variant="h6" sx={{ mb: 2, mt: 3 }}>
-                Bank Details
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 3, 
+                  mt: 5, 
+                  fontWeight: 500,
+                  color: theme.palette.primary.main,
+                  borderBottom: `2px solid ${theme.palette.primary.main}`,
+                  pb: 1,
+                  display: 'inline-block'
+                }}
+              >
+                Banking Information
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>  
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                   <TextField
-                    fullWidth
-                    label="Account Name"
-                    value={formData.accountName}
-                    onChange={handleInputChange('accountName')}
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
+                    sx={{ flex: 1 }}
                     label="Bank Name"
                     value={formData.bankName}
                     onChange={handleInputChange('bankName')}
                     required
+                    variant="outlined"
                   />
-                </Grid>
-                <Grid item xs={12} sm={6}>
                   <TextField
-                    fullWidth
+                    sx={{ flex: 1 }}
                     label="Account Number"
                     value={formData.accountNumber}
                     onChange={handleInputChange('accountNumber')}
                     required
+                    variant="outlined"
                   />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                   <TextField
-                    fullWidth
+                    sx={{ flex: 1 }}
                     label="IFSC Code"
                     value={formData.ifscCode}
                     onChange={handleInputChange('ifscCode')}
                     required
+                    variant="outlined"
                   />
-                </Grid>
-              </Grid>
+                  <TextField
+                    sx={{ flex: 1 }}
+                    label="Account Holder Name"
+                    value={formData.accountName}
+                    onChange={handleInputChange('accountName')}
+                    required
+                    variant="outlined"
+                  />
+                </Box>
+              </Box>
               
-              <Typography variant="h6" sx={{ mb: 2, mt: 3 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 3, 
+                  mt: 5, 
+                  fontWeight: 500,
+                  color: theme.palette.primary.main,
+                  borderBottom: `2px solid ${theme.palette.primary.main}`,
+                  pb: 1,
+                  display: 'inline-block'
+                }}
+              >
                 Document Uploads
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={3}>
-                  <Button variant="outlined" component="label" fullWidth>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Button 
+                    variant="outlined" 
+                    component="label" 
+                    fullWidth
+                    sx={{ 
+                      py: 1.5, 
+                      borderRadius: 1,
+                      borderWidth: '1px',
+                      '&:hover': {
+                        borderWidth: '1px'
+                      }
+                    }}
+                  >
                     Upload Photo
                     <input type="file" hidden accept="image/*" onChange={handleFileChange('photo')} />
                   </Button>
-                  {formData.photo && <Typography variant="caption">{formData.photo.name}</Typography>}
+                  {formData.photo && (
+                    <Box sx={{ mt: 1, p: 1, bgcolor: 'rgba(0, 0, 0, 0.04)', borderRadius: 1 }}>
+                      <Typography variant="caption" sx={{ display: 'block', wordBreak: 'break-all' }}>
+                        {formData.photo.name}
+                      </Typography>
+                    </Box>
+                  )}
                 </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Button variant="outlined" component="label" fullWidth>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Button 
+                    variant="outlined" 
+                    component="label" 
+                    fullWidth
+                    sx={{ 
+                      py: 1.5, 
+                      borderRadius: 1,
+                      borderWidth: '1px',
+                      '&:hover': {
+                        borderWidth: '1px'
+                      }
+                    }}
+                  >
                     Upload Aadhaar
                     <input type="file" hidden accept=".pdf,image/*" onChange={handleFileChange('aadhaar')} />
                   </Button>
-                  {formData.aadhaar && <Typography variant="caption">{formData.aadhaar.name}</Typography>}
+                  {formData.aadhaar && (
+                    <Box sx={{ mt: 1, p: 1, bgcolor: 'rgba(0, 0, 0, 0.04)', borderRadius: 1 }}>
+                      <Typography variant="caption" sx={{ display: 'block', wordBreak: 'break-all' }}>
+                        {formData.aadhaar.name}
+                      </Typography>
+                    </Box>
+                  )}
                 </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Button variant="outlined" component="label" fullWidth>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Button 
+                    variant="outlined" 
+                    component="label" 
+                    fullWidth
+                    sx={{ 
+                      py: 1.5, 
+                      borderRadius: 1,
+                      borderWidth: '1px',
+                      '&:hover': {
+                        borderWidth: '1px'
+                      }
+                    }}
+                  >
                     Upload PAN Card
                     <input type="file" hidden accept=".pdf,image/*" onChange={handleFileChange('panCard')} />
                   </Button>
-                  {formData.panCard && <Typography variant="caption">{formData.panCard.name}</Typography>}
+                  {formData.panCard && (
+                    <Box sx={{ mt: 1, p: 1, bgcolor: 'rgba(0, 0, 0, 0.04)', borderRadius: 1 }}>
+                      <Typography variant="caption" sx={{ display: 'block', wordBreak: 'break-all' }}>
+                        {formData.panCard.name}
+                      </Typography>
+                    </Box>
+                  )}
                 </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Button variant="outlined" component="label" fullWidth>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Button 
+                    variant="outlined" 
+                    component="label" 
+                    fullWidth
+                    sx={{ 
+                      py: 1.5, 
+                      borderRadius: 1,
+                      borderWidth: '1px',
+                      '&:hover': {
+                        borderWidth: '1px'
+                      }
+                    }}
+                  >
                     Upload License
                     <input type="file" hidden accept=".pdf,image/*" onChange={handleFileChange('license')} />
                   </Button>
-                  {formData.license && <Typography variant="caption">{formData.license.name}</Typography>}
+                  {formData.license && (
+                    <Box sx={{ mt: 1, p: 1, bgcolor: 'rgba(0, 0, 0, 0.04)', borderRadius: 1 }}>
+                      <Typography variant="caption" sx={{ display: 'block', wordBreak: 'break-all' }}>
+                        {formData.license.name}
+                      </Typography>
+                    </Box>
+                  )}
                 </Grid>
               </Grid>
               
-              <Grid container spacing={2}>
+              <Divider sx={{ my: 4 }} />
+              
+              <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                    <Button type="submit" variant="contained" fullWidth>
-                      Register
+                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+                    <Button 
+                      type="submit" 
+                      variant="contained" 
+                      sx={{ 
+                        height: 40,
+                        fontWeight: 600,
+                        px: 3
+                      }}
+                    >
+                      Submit
                     </Button>
-                    <Button variant="outlined" fullWidth onClick={onBack}>
-                      Back
+                    <Button 
+                      variant="outlined" 
+                      onClick={onBack}
+                      sx={{ 
+                        height: 40,
+                        px: 3
+                      }}
+                    >
+                      Cancel
                     </Button>
                   </Box>
                 </Grid>
