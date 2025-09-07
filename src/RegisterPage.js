@@ -5,7 +5,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import HeaderView from './HeaderView';
 
-function RegisterPage({ onBack, onLogout, darkMode, onToggleDarkMode }) {
+function RegisterPage({ onBack, onLogout, onRegister, onEdit, onAdmin, darkMode, onToggleDarkMode }) {
   const theme = useTheme();
   const [formData, setFormData] = useState({
     name: '',
@@ -72,7 +72,7 @@ function RegisterPage({ onBack, onLogout, darkMode, onToggleDarkMode }) {
 
   return (
     <>
-      <HeaderView showButtons={true} onLogout={onLogout} onBack={onBack} darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} />
+      <HeaderView showButtons={true} onLogout={onLogout} onBack={onBack} onRegister={onRegister} onEdit={onEdit} onAdmin={onAdmin} darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} />
       <Box component="main" sx={{ p: 3 }}>
         <Toolbar />
         <Container maxWidth="md">

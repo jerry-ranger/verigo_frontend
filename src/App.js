@@ -77,6 +77,10 @@ function App() {
     setCurrentPage('admin');
   };
 
+  const handleEdit = () => {
+    setCurrentPage('edit');
+  };
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
@@ -90,7 +94,7 @@ function App() {
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <RegisterPage onLogout={handleLogout} onBack={handleBack} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+          <RegisterPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onEdit={handleEdit} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
         </ThemeProvider>
       );
     }
@@ -98,7 +102,7 @@ function App() {
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <AdminPage onLogout={handleLogout} onBack={handleBack} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+          <AdminPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onEdit={handleEdit} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
         </ThemeProvider>
       );
     }
@@ -106,14 +110,14 @@ function App() {
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <HomePage onLogout={handleLogout} onRegister={handleRegister} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+          <HomePage onLogout={handleLogout} onRegister={handleRegister} onAdmin={handleAdmin} onEdit={handleEdit} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
         </ThemeProvider>
       );
     }
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <EditPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+        <EditPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onAdmin={handleAdmin} onEdit={handleEdit} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
       </ThemeProvider>
     );
   }

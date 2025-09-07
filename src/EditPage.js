@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import HeaderView from './HeaderView';
 
-function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, onAdmin }) {
+function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, onAdmin, onEdit }) {
   const theme = useTheme();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +41,7 @@ function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, on
         darkMode={darkMode} 
         onToggleDarkMode={onToggleDarkMode}
         onRegister={onRegister}
+        onEdit={onEdit}
         onAdmin={onAdmin}
       />
       <Box component="main" sx={{ p: 3 }}>
@@ -78,29 +79,59 @@ function EditPage({ onBack, onLogout, darkMode, onToggleDarkMode, onRegister, on
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>ID</TableCell>
+                      <TableCell>Partner ID</TableCell>
                       <TableCell>Name</TableCell>
-                      <TableCell>Email</TableCell>
+                      <TableCell>DOB</TableCell>
                       <TableCell>Phone</TableCell>
-                      <TableCell>Department</TableCell>
-                      <TableCell>Position</TableCell>
-                      <TableCell align="right">Salary</TableCell>
-                      <TableCell>Join Date</TableCell>
-                      <TableCell>Status</TableCell>
+                      <TableCell>Email</TableCell>
+                      <TableCell>Father's Name</TableCell>
+                      <TableCell>Mother's Name</TableCell>
+                      <TableCell>Marital Status</TableCell>
+                      <TableCell>Bank Name</TableCell>
+                      <TableCell>Account Number</TableCell>
+                      <TableCell>IFSC Code</TableCell>
+                      <TableCell>Account Name</TableCell>
+                      <TableCell>Photo</TableCell>
+                      <TableCell>Aadhaar</TableCell>
+                      <TableCell>License</TableCell>
+                      <TableCell>PAN Card</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {employees.map((employee, index) => (
                       <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{employee.partnerId}</TableCell>
                         <TableCell>{employee.name}</TableCell>
-                        <TableCell>{employee.email}</TableCell>
-                        <TableCell>{employee.phone}</TableCell>
-                        <TableCell>{employee.department}</TableCell>
-                        <TableCell>{employee.position}</TableCell>
-                        <TableCell align="right">{employee.salary}</TableCell>
-                        <TableCell>{employee.joinDate}</TableCell>
-                        <TableCell>{employee.status}</TableCell>
+                        <TableCell>{employee.dob}</TableCell>
+                        <TableCell>{employee.phoneNumber}</TableCell>
+                        <TableCell>{employee.emailId}</TableCell>
+                        <TableCell>{employee.fatherName}</TableCell>
+                        <TableCell>{employee.motherName}</TableCell>
+                        <TableCell>{employee.maritalStatus}</TableCell>
+                        <TableCell>{employee.bankName}</TableCell>
+                        <TableCell>{employee.accountNumber}</TableCell>
+                        <TableCell>{employee.ifscCode}</TableCell>
+                        <TableCell>{employee.accountName}</TableCell>
+                        <TableCell>
+                          {employee.documents?.photo ? (
+                            <a href={employee.documents.photo.replace('s3://', 'https://s3.ap-south-1.amazonaws.com/')} target="_blank" rel="noopener noreferrer">View</a>
+                          ) : 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          {employee.documents?.aadhaar ? (
+                            <a href={employee.documents.aadhaar.replace('s3://', 'https://s3.ap-south-1.amazonaws.com/')} target="_blank" rel="noopener noreferrer">View</a>
+                          ) : 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          {employee.documents?.license ? (
+                            <a href={employee.documents.license.replace('s3://', 'https://s3.ap-south-1.amazonaws.com/')} target="_blank" rel="noopener noreferrer">View</a>
+                          ) : 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          {employee.documents?.panCard ? (
+                            <a href={employee.documents.panCard.replace('s3://', 'https://s3.ap-south-1.amazonaws.com/')} target="_blank" rel="noopener noreferrer">View</a>
+                          ) : 'N/A'}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

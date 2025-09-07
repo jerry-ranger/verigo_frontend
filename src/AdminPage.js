@@ -3,7 +3,7 @@ import { useState } from 'react';
 import HeaderView from './HeaderView';
 import { credentialsService } from './credentialsService';
 
-function AdminPage({ onLogout, onBack, darkMode, onToggleDarkMode }) {
+function AdminPage({ onLogout, onBack, onRegister, onEdit, onAdmin, darkMode, onToggleDarkMode }) {
   const [newId, setNewId] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
@@ -34,7 +34,7 @@ function AdminPage({ onLogout, onBack, darkMode, onToggleDarkMode }) {
 
   return (
     <>
-      <HeaderView showButtons={true} onLogout={onLogout} onBack={onBack} darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} />
+      <HeaderView showButtons={true} onLogout={onLogout} onBack={onBack} onRegister={onRegister} onEdit={onEdit} onAdmin={onAdmin} darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} />
       <Box component="main" sx={{ p: 3 }}>
         <Toolbar />
         <Paper sx={{ p: 4, maxWidth: 400, mx: 'auto' }}>
