@@ -5,13 +5,14 @@ import HeaderView from './HeaderView';
 import HomePage from './HomePage';
 import RegisterPage from './RegisterPage';
 import AdminPage from './AdminPage';
+import EditPage from './EditPage';
 import { credentialsService } from './credentialsService';
 
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState('edit');
   const [darkMode, setDarkMode] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -81,7 +82,7 @@ function App() {
   };
 
   const handleBack = () => {
-    setCurrentPage('home');
+    setCurrentPage('edit');
   };
 
   if (isLoggedIn) {
@@ -101,10 +102,18 @@ function App() {
         </ThemeProvider>
       );
     }
+    if (currentPage === 'home') {
+      return (
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <HomePage onLogout={handleLogout} onRegister={handleRegister} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+        </ThemeProvider>
+      );
+    }
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <HomePage onLogout={handleLogout} onRegister={handleRegister} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+        <EditPage onLogout={handleLogout} onBack={handleBack} onRegister={handleRegister} onAdmin={handleAdmin} darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
       </ThemeProvider>
     );
   }
